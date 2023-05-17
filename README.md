@@ -1,20 +1,76 @@
-# MCS
-Detencting Change in Categorical Data (Practice)
+# Prueba Técnica: Minería de contrastes
+
+## Descripción del proyecto
+
+El proyecto consiste en implementar un flujo de minería de datos sobre un conjunto de datos con información salarial de una organización. Se utilizará la técnica de Minería de contrastes (Contrast Set Mining, CSM) para encontrar conjuntos de características que indiquen diferencias significativas entre grupos.
+
+## Pasos del proyecto
+
+1. Análisis exploratorio de datos:
+   - Realizar una descripción exploratoria del conjunto de datos, incluyendo al menos dos visualizaciones de datos.
+
+2. Pre-procesamiento de datos:
+   - Convertir las variables numéricas en variables categóricas, ya que la minería de contrastes trabaja exclusivamente con datos categóricos.
+
+3. Minería de contrastes:
+   - Implementar un algoritmo de minería de contrastes que recupere todos los conjuntos de contraste en los datos proporcionados.
+   - Ejecutar el algoritmo una vez por cada variable del conjunto de datos, tomando cada una como variable de grupo.
+
+4. Conteinerizacion en docker.
+
+5. Resultados y concluisones
+
+## Tecnologías y Herramientas utilizadas
+
+El proyecto se desarrollará utilizando las siguientes tecnologías y herramientas:
+
+- Python
+- Docker
+
+### Librerías de Python utilizadas:
+
+- pandas
+- seaborn
+- scipy.stats (importada como st)
+- matplotlib.pyplot (importada como plt)
+- matplotlib.colors (importada como LinearSegmentedColormap)
+- itertools
+
+Librerías de Machine Learning utilizadas:
+
+- scikit-learn
+  - from sklearn.preprocessing import OrdinalEncoder
+  - from sklearn.compose import ColumnTransformer
+  - from sklearn.preprocessing import StandardScaler
+  - from sklearn.decomposition import PCA
 
 
-1. Titulo y descripcion del proyecto
 
-2. Tecnologias y Herramientas utilizadas.
+## Descripción de los datos
 
-3. Estructura del proyecto
+### Características
 
-4. Conjuntos de datos.
+- `JobTitle`: El puesto al cual pertenece el empleado.
+- `Gender`: Sexo del empleado.
+- `Age`: Edad del empleado.
+- `PerfEval`: Rendimiento de evaluación en una escala del 1 al 5, donde 1 es el mínimo y 5 es el máximo.
+- `Edu`: Nivel de educación del empleado.
+- `Dept`: Área/Departamento de trabajo del empleado.
+- `Seniority`: Antigüedad/Maestría en el puesto del empleado.
+- `BasePay`: Sueldo base del empleado.
+- `Bonus`: Bonos salariales recibidos por el empleado.
 
-5. Procesamiento y preparacion de datos.
+## Antecedentes
 
-6. Modelado y evaluacion
+Para que un conjunto de contraste sea considerado "viable", debe cumplir con los siguientes criterios:
 
-7. Resultados y concluisones
+- `Grande`: El conjunto de contraste debe superar una desviación mínima establecida. No se proporciona el valor exacto de la desviación mínima requerida, por lo que se debe ajustar este valor de acuerdo a los objetivos y características del conjunto de datos específico.
+
+- `Significativo`: La asociación entre la variable de grupo y el conjunto de contraste debe ser estadísticamente significativa. Esto se determinará mediante la prueba estadística `chi2` aplicada a una tabla de contingencia, donde las filas representan la pertenencia al conjunto de contraste y las columnas representan los grupos. Se utilizará un umbral de significancia de `0.05` para completar el valor `p-value`.
+
+- `Productivo`: Un conjunto de contraste se considera productivo si todos sus subconjuntos propios también son conjuntos de contraste viables. No se proporciona información adicional sobre cómo determinar la productividad del conjunto de contraste.
+
+
 
 8. Instrucciones de uso
 
