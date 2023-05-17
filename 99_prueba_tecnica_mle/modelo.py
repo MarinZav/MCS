@@ -86,3 +86,7 @@ data_encoded[numeric] = scaler.transform(data_encoded[numeric])
 
 
 print(data_encoded.head()) 
+
+
+
+#### modelo de clustering 
