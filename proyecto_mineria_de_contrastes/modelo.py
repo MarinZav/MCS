@@ -54,39 +54,3 @@ data['total_salary_range'] = data['total_salary'].apply(total_salary_range)
 data['age_group'] = data['age'].apply(assing_age_range)
 
 
-
-
-# codificacion de etiquetas
-
-encoder = ColumnTransformer(
-    [('encoder', OrdinalEncoder(), ['jobTitle', 'gender','edu','dept','age_group','total_salary_range'])],
-    remainder='passthrough'
-)
-
-data_encoded = encoder.fit_transform(data)
-
-
-# eliminamos columnas relacionadas
-
-data_encoded = pd.DataFrame(data_encoded)
-
-data_encoded = (
-    data_encoded
-    .rename(columns={0:'job_title',1:'gender',3:'perf_eval',4:'edu',5:'dept',6:'seniority',9:'age_group',11:'total_salary_range'})
-    .drop(columns={2,7,8,10})
-)
-
-# escalado de caracteristicas
-
-numeric = ['job_title', 'gender', 'perf_eval', 'edu','dept','seniority','age_group','total_salary_range']
-
-scaler = StandardScaler()
-scaler.fit(data_encoded[numeric])
-data_encoded[numeric] = scaler.transform(data_encoded[numeric])
-
-
-print(data_encoded.head()) 
-
-
-
-#### modelo de clustering 
