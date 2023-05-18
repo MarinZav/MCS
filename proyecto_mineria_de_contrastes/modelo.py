@@ -3,7 +3,8 @@
 ### importacion de librerias
 
 import pandas as pd
-
+import numpy as np
+import itertools
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler
@@ -52,5 +53,17 @@ def total_salary_range(salary):
 # aplicamos nuestras funciones
 data['total_salary_range'] = data['total_salary'].apply(total_salary_range)
 data['age_group'] = data['age'].apply(assing_age_range)
+
+
+# eliminamos las columnas inneceesarias
+testisng_df = (
+    data
+    .drop(columns={'age','base_pay','bonus','total_salary'})
+)
+
+data = testisng_df.to_numpy()
+
+df = pd.DataFrame(testisng_df)
+
 
 
