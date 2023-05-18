@@ -16,10 +16,13 @@ try:
 except:
     data = pd.read_csv('datasets/data.csv')
 
+data = data.rename(columns={'jobTitle':'job_title',
+                            'perfEval':'perf_eval',
+                            'basePay':'base_pay'})
 
 # creamos una columna nueva con el salario total
 
-data['total_salary'] = data['basePay'] + data['bonus']
+data['total_salary'] = data['base_pay'] + data['bonus']
 
 # función que calcule la categoría de edad
 
@@ -60,10 +63,5 @@ testisng_df = (
     data
     .drop(columns={'age','base_pay','bonus','total_salary'})
 )
-
-data = testisng_df.to_numpy()
-
-df = pd.DataFrame(testisng_df)
-
 
 
