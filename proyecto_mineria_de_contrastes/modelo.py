@@ -65,6 +65,8 @@ testisng_df = (
 )
 
 
+df = pd.DataFrame(testisng_df.head(40))
+
 def generate_contrast_sets(data, max_level):
     tree = {}
     columns = list(data.keys())
@@ -117,7 +119,7 @@ def calculate_support(contrast_sets, df, mindev):
         for c, support in support_dict.items():
             if level + 1 in contrast_sets:  # Si existe el nivel de los hijos
                 children_supports = [supports[level + 1][child_c] for child_c in contrast_sets[level + 1]]
-                max_diff = np.max(np.abs(np.array(children_supports) - support))  # Calcular la máxima diferencia de soporte con los hijos
+                max_diff = np.max(np.abs(np.array(children_supports) - support))  # Calcular la máxima diferencia de soporte 
                 if max_diff >= mindev:  # Si la máxima diferencia de soporte es mayor o igual a mindev
                     filtered_support_dict[c] = support
         if filtered_support_dict:  # Si el diccionario no está vacío
@@ -126,10 +128,10 @@ def calculate_support(contrast_sets, df, mindev):
     return filtered_supports
 
 max_level = 8
-mindev = 0.00
+mindev = 0.1
 
-contrast_sets_tree = generate_contrast_sets(data, max_level)
-filtered_supports = calculate_support(contrast_sets_tree, testisng_df, mindev)
+contrast_sets_tree = generate_contrast_sets(df, max_level)
+filtered_supports = calculate_support(contrast_sets_tree, df, mindev)
 
 for level, support in filtered_supports.items():
     if support:  # Si el nivel tiene soportes que cumplen con mindev

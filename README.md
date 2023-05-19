@@ -25,7 +25,6 @@ El proyecto consiste en implementar un flujo de minería de datos sobre un conju
 El proyecto se desarrollará utilizando las siguientes tecnologías y herramientas:
 
 - Python
-- Docker
 
 ### Librerías de Python utilizadas:
 
@@ -72,6 +71,20 @@ Para que un conjunto de contraste sea considerado "viable", debe cumplir con los
 
 
 
-8. Instrucciones de uso
+### Instrucciones de uso
 
-9. Referencias
+
+pip install -r requirements.txt
+
+
+## Referencias
+
+- Stephen D. Bay, Michael J. Pazzani. Detecting Change in Categorical Data:
+Mining Contrast Sets. In Proc. 1999 ACM SIGKDD International Conference
+on Knowledge Discovery and Data Mining
+- Amit Satsangi, Osmar R. Zaïane. Contrasting the Contrast Sets: An
+Alternative Approach. Database Engineering and Applications Symposium,
+2007
+- Stephen D. Bay, Michael J. Pazzani. Detecting Group Differences: Mining
+Contrast Sets. Data Mining and Knowledge Discovery. Volume 5, Number 3 /
+July, 2001. Pages 213-246. Springer Netherlands.
