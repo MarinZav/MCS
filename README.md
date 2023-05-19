@@ -16,9 +16,8 @@ El proyecto consiste en implementar un flujo de minería de datos sobre un conju
    - Implementar un algoritmo de minería de contrastes que recupere todos los conjuntos de contraste en los datos proporcionados.
    - Ejecutar el algoritmo una vez por cada variable del conjunto de datos, tomando cada una como variable de grupo.
 
-4. Conteinerizacion en docker.
 
-5. Resultados y concluisones
+4. Resultados y concluisones
 
 ## Tecnologías y Herramientas utilizadas
 
@@ -58,17 +57,6 @@ Librerías de Machine Learning utilizadas:
 - `Seniority`: Antigüedad/Maestría en el puesto del empleado.
 - `BasePay`: Sueldo base del empleado.
 - `Bonus`: Bonos salariales recibidos por el empleado.
-
-## Antecedentes
-
-Para que un conjunto de contraste sea considerado "viable", debe cumplir con los siguientes criterios:
-
-- `Grande`: El conjunto de contraste debe superar una desviación mínima establecida. No se proporciona el valor exacto de la desviación mínima requerida, por lo que se debe ajustar este valor de acuerdo a los objetivos y características del conjunto de datos específico.
-
-- `Significativo`: La asociación entre la variable de grupo y el conjunto de contraste debe ser estadísticamente significativa. Esto se determinará mediante la prueba estadística `chi2` aplicada a una tabla de contingencia, donde las filas representan la pertenencia al conjunto de contraste y las columnas representan los grupos. Se utilizará un umbral de significancia de `0.05` para completar el valor `p-value`.
-
-- `Productivo`: Un conjunto de contraste se considera productivo si todos sus subconjuntos propios también son conjuntos de contraste viables. No se proporciona información adicional sobre cómo determinar la productividad del conjunto de contraste.
-
 
 
 ### Instrucciones de uso
