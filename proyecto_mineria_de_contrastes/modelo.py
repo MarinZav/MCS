@@ -65,3 +65,72 @@ testisng_df = (
 )
 
 
+def generate_contrast_sets(data, max_level):
+    tree = {}
+    columns = list(data.keys())
+    classes_level_1 = list(set(data[columns[0]]))
+    tree[1] = classes_level_1
+
+    for level in range(2, max_level + 1):
+        new_level_classes = []
+        if level == 2:
+            combinations = list(itertools.product(tree[1], set(data[columns[1]])))
+        else:
+            combinations = generate_combinations(tree[level - 1], set(data[columns[level - 1]]))
+
+        for combination in combinations:
+            new_classes = tuple(combination)
+            if not any(set(c) == set(new_classes) for c in tree.values()):
+                new_level_classes.append(new_classes)
+
+        if new_level_classes:
+            tree[level] = new_level_classes
+        else:
+            break
+
+    return tree
+
+def generate_combinations(previous_level, column_data):
+    combinations = []
+    for prev_class in previous_level:
+        for column_value in column_data:
+            new_combination = prev_class + (column_value,)
+            if len(set(new_combination)) == len(new_combination):
+                combinations.append(new_combination)
+    return combinations
+
+def calculate_support(contrast_sets, df, mindev):
+    supports = {}
+    for level, classes in contrast_sets.items():
+        supports[level] = {}
+        for c in classes:
+            if type(c) == tuple:
+                support = np.mean(df.apply(lambda row: all(item in row.values for item in c), axis=1))
+            else:
+                support = (df[df.columns[0]] == c).mean()
+            supports[level][c] = support
+            
+    # Seleccionar solo aquellos conjuntos de contraste cuyo soporte sea mayor o igual a mindev
+    filtered_supports = {}
+    for level, support_dict in supports.items():
+        filtered_support_dict = {}
+        for c, support in support_dict.items():
+            if level + 1 in contrast_sets:  # Si existe el nivel de los hijos
+                children_supports = [supports[level + 1][child_c] for child_c in contrast_sets[level + 1]]
+                max_diff = np.max(np.abs(np.array(children_supports) - support))  # Calcular la máxima diferencia de soporte con los hijos
+                if max_diff >= mindev:  # Si la máxima diferencia de soporte es mayor o igual a mindev
+                    filtered_support_dict[c] = support
+        if filtered_support_dict:  # Si el diccionario no está vacío
+            filtered_supports[level] = filtered_support_dict
+
+    return filtered_supports
+
+max_level = 8
+mindev = 0.00
+
+contrast_sets_tree = generate_contrast_sets(data, max_level)
+filtered_supports = calculate_support(contrast_sets_tree, testisng_df, mindev)
+
+for level, support in filtered_supports.items():
+    if support:  # Si el nivel tiene soportes que cumplen con mindev
+        print(f'Level {level}: {support}')
