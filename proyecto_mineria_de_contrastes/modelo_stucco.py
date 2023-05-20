@@ -5,9 +5,7 @@
 import pandas as pd
 import numpy as np
 import itertools
-from sklearn.preprocessing import OrdinalEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import StandardScaler
+from scipy.stats import chi2_contingency
 
 # carga de datos
 
@@ -59,39 +57,77 @@ data['age_group'] = data['age'].apply(assing_age_range)
 
 
 # eliminamos las columnas inneceesarias
-testisng_df = (
+df = (
     data
     .drop(columns={'age','base_pay','bonus','total_salary'})
 )
 
 
-df = pd.DataFrame(testisng_df.head(40))
 
-def generate_contrast_sets(data, max_level):
+# Función para calcular soporte
+def calculate_support(df, c):
+    if type(c) == tuple:
+        support = np.mean(df.apply(lambda row: all(item in row.values for item in c), axis=1))
+    else:
+        support = (df[df.columns[0]] == c).mean()
+    return support
+
+# Función para calcular chi2 y p-value
+def calculate_chi2(df, c):
+    contingency_table = pd.crosstab(df[df.columns[0]], df.apply(lambda row: all(item in row.values for item in c), axis=1))
+    chi2, p, _, _ = chi2_contingency(contingency_table)
+    return chi2, p
+
+# Función para generar conjuntos de contraste
+def generate_contrast_sets(df, max_level, mindev, level1_column):
+    # Reordenar las columnas para que la columna del nivel 1 esté al inicio
+    cols = df.columns.tolist()
+    cols.remove(level1_column)
+    cols.insert(0, level1_column)
+    df = df[cols]
+
     tree = {}
-    columns = list(data.keys())
-    classes_level_1 = list(set(data[columns[0]]))
+    supports = {}
+    chi2s = {}
+    ps = {}
+    columns = df.columns
+    classes_level_1 = list(df[columns[0]].unique())
     tree[1] = classes_level_1
+    supports[1] = {c: calculate_support(df, c) for c in classes_level_1}
+    chi2s[1] = {c: calculate_chi2(df, c)[0] for c in classes_level_1}
+    ps[1] = {c: calculate_chi2(df, c)[1] for c in classes_level_1}
 
     for level in range(2, max_level + 1):
         new_level_classes = []
+        new_level_supports = {}
+        new_level_chi2s = {}
+        new_level_ps = {}
         if level == 2:
-            combinations = list(itertools.product(tree[1], set(data[columns[1]])))
+            combinations = list(itertools.product(tree[1], df[columns[1]].unique()))
         else:
-            combinations = generate_combinations(tree[level - 1], set(data[columns[level - 1]]))
+            combinations = generate_combinations(tree[level - 1], df[columns[level - 1]].unique())
 
         for combination in combinations:
             new_classes = tuple(combination)
-            if not any(set(c) == set(new_classes) for c in tree.values()):
+            new_support = calculate_support(df, new_classes)
+            new_chi2, new_p = calculate_chi2(df, new_classes)
+            if new_support >= mindev and not any(set(c) == set(new_classes) for c in tree.values()):
                 new_level_classes.append(new_classes)
+                new_level_supports[new_classes] = new_support
+                new_level_chi2s[new_classes] = new_chi2
+                new_level_ps[new_classes] = new_p
 
         if new_level_classes:
             tree[level] = new_level_classes
+            supports[level] = new_level_supports
+            chi2s[level] = new_level_chi2s
+            ps[level] = new_level_ps
         else:
             break
 
-    return tree
+    return tree, supports, chi2s, ps
 
+# Función para generar combinaciones
 def generate_combinations(previous_level, column_data):
     combinations = []
     for prev_class in previous_level:
@@ -101,38 +137,32 @@ def generate_combinations(previous_level, column_data):
                 combinations.append(new_combination)
     return combinations
 
-def calculate_support(contrast_sets, df, mindev):
-    supports = {}
-    for level, classes in contrast_sets.items():
-        supports[level] = {}
-        for c in classes:
-            if type(c) == tuple:
-                support = np.mean(df.apply(lambda row: all(item in row.values for item in c), axis=1))
-            else:
-                support = (df[df.columns[0]] == c).mean()
-            supports[level][c] = support
-            
-    # Seleccionar solo aquellos conjuntos de contraste cuyo soporte sea mayor o igual a mindev
-    filtered_supports = {}
-    for level, support_dict in supports.items():
-        filtered_support_dict = {}
-        for c, support in support_dict.items():
-            if level + 1 in contrast_sets:  # Si existe el nivel de los hijos
-                children_supports = [supports[level + 1][child_c] for child_c in contrast_sets[level + 1]]
-                max_diff = np.max(np.abs(np.array(children_supports) - support))  # Calcular la máxima diferencia de soporte 
-                if max_diff >= mindev:  # Si la máxima diferencia de soporte es mayor o igual a mindev
-                    filtered_support_dict[c] = support
-        if filtered_support_dict:  # Si el diccionario no está vacío
-            filtered_supports[level] = filtered_support_dict
+# Función para reestructurar soportes, chi2s y ps
+def restructure(supports, chi2s, ps):
+    restructured = []
+    for level, support in supports.items():
+        for classes, value in support.items():
+            contrast_set = ", ".join(classes) if isinstance(classes, tuple) else classes
+            restructured.append({
+                'Contrast Set': contrast_set,
+                'Support': value,
+                'Chi2': chi2s[level][classes],
+                'P-value': ps[level][classes]
+            })
+    return restructured
 
-    return filtered_supports
-
+# Configurar variables
 max_level = 8
-mindev = 0.1
+mindev = 0.05
 
-contrast_sets_tree = generate_contrast_sets(df, max_level)
-filtered_supports = calculate_support(contrast_sets_tree, df, mindev)
+# Indicar la columna para el nivel 1
+level1_column = 'total_salary_range'  
 
-for level, support in filtered_supports.items():
-    if support:  # Si el nivel tiene soportes que cumplen con mindev
-        print(f'Level {level}: {support}')
+# Generar conjuntos de contraste y calcular soportes, chi2s y ps
+contrast_sets_tree, supports, chi2s, ps = generate_contrast_sets(df, max_level, mindev, level1_column)
+
+# Reestructurar los soportes, chi2s y ps y convertirlos a un DataFrame de pandas
+restructured = restructure(supports, chi2s, ps)
+df_restructured = pd.DataFrame(restructured)
+
+df_restructured
