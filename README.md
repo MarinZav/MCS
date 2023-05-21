@@ -24,6 +24,8 @@ El proyecto consiste en implementar un flujo de minería de datos sobre un conju
 El proyecto se desarrollará utilizando las siguientes tecnologías y herramientas:
 
 - Python
+- Jupyter Notebook
+- Docker
 
 ### Librerías de Python utilizadas:
 
