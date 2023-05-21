@@ -10,9 +10,9 @@ from scipy.stats import chi2_contingency
 # carga de datos
 
 try:
-    data = pd.read_csv('/datasets/data.csv')
+    data = pd.read_csv('./proyecto_mineria_de_contrastes/datasets/data.csv')
 except:
-    data = pd.read_csv('datasets/data.csv')
+    data = pd.read_csv('../datasets/data.csv')
 
 data = data.rename(columns={'jobTitle':'job_title',
                             'perfEval':'perf_eval',
@@ -166,3 +166,11 @@ restructured = restructure(supports, chi2s, ps)
 df_restructured = pd.DataFrame(restructured)
 
 df_restructured
+
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+
+
+
+print("Cargando...")
+print(df_restructured)

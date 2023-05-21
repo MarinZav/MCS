@@ -62,7 +62,21 @@ Librerías de Machine Learning utilizadas:
 ### Instrucciones de uso
 
 
-pip install -r requirements.txt
+1. Clona tu repositorio de GitHub: Primero, necesitarás clonar tu repositorio de GitHub en tu máquina local. Puedes hacerlo con el siguiente comando:
+
+ `git clone https://github.com/MarinZav/MCS.git`
+
+2. Navega a la carpeta del proyecto: Una vez que hayas clonado tu repositorio, deberás navegar a la carpeta del proyecto con el siguiente comando:
+
+`cd MCS`
+
+3. Construye tu imagen de Docker: Ahora puedes construir tu imagen de Docker. Asegúrate de estar en el directorio que contiene tu Dockerfile y luego ejecuta el siguiente comando:
+
+`docker build -t stucco .`
+
+4. Ejecuta tu contenedor de Docker: Una vez que tu imagen está construida, puedes ejecutarla con el siguiente comando:
+
+`docker run stucco`
 
 
 ## Referencias
